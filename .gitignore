@@ -1,0 +1,18 @@
+# Virtual Environment
+venv/
+# Python Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+# Logs
+logs/
+*.log
+# Database Files
+*.db
+# Environment Variables
+.env
+# VSCode Settings
+.vscode/
