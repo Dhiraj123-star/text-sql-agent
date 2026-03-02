@@ -1,0 +1,11 @@
+services:
+  text-to-sql-app:
+    build: .
+    container_name: text_to_sql_app
+    ports:
+      - "8501:8501"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    restart: unless-stopped
