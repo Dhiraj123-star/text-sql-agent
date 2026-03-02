@@ -1,16 +1,16 @@
+# 📊 AI Text-to-SQL App (Local LLM + Docker)
 
-# 📊 AI Text-to-SQL App (Local LLM Powered)
-
-A simple AI-powered **Text-to-SQL application** that allows users to ask questions about a database in plain English and automatically generates and executes SQL queries.
+A fully local **AI-powered Text-to-SQL application** that converts natural language questions into SQL queries and executes them on a database.
 
 Built using:
 
-* 🧠 Ollama (Local LLM – Gemma 3 1B)
-* 🔗 LangChain (LCEL Pipeline)
+* 🧠 Ollama (Gemma 3 1B – runs on host)
+* 🔗 LangChain (LCEL pipeline)
 * 🗄️ SQLite
 * 🎨 Streamlit
+* 🐳 Docker & Docker Compose
 
-Everything runs **fully locally** — no OpenAI API, no external cloud.
+Everything runs **fully locally** — no OpenAI API, no cloud dependency.
 
 ---
 
@@ -18,10 +18,10 @@ Everything runs **fully locally** — no OpenAI API, no external cloud.
 
 This application:
 
-1. Accepts natural language questions from the user
-2. Converts the question into a valid SQL query using a local LLM
+1. Accepts natural language questions
+2. Converts them into valid SQL queries using a local LLM
 3. Executes the query on a SQLite database
-4. Displays the result in a formatted table
+4. Displays formatted results in a clean UI
 
 Example:
 
@@ -34,7 +34,10 @@ Who scored the highest in Math?
 **Generated SQL:**
 
 ```sql
-SELECT name FROM grades WHERE subject = 'Math' ORDER BY score DESC LIMIT 1;
+SELECT name FROM grades 
+WHERE subject = 'Math' 
+ORDER BY score DESC 
+LIMIT 1;
 ```
 
 **Output:**
@@ -45,19 +48,23 @@ SELECT name FROM grades WHERE subject = 'Math' ORDER BY score DESC LIMIT 1;
 
 ---
 
-## 🧠 How It Works
+## 🧠 System Architecture
 
-User Question
-↓
-LangChain Prompt Template
-↓
-Local LLM (Gemma 3 1B via Ollama)
-↓
-Generated SQL Query
-↓
-SQLite Execution
-↓
-Formatted Result in Streamlit
+```
+User (Browser)
+      ↓
+Streamlit (Docker Container)
+      ↓
+LangChain LCEL Pipeline
+      ↓
+Ollama (Running on Host)
+      ↓
+Gemma 3 1B Model
+      ↓
+SQLite Database
+      ↓
+Formatted Result
+```
 
 ---
 
@@ -66,8 +73,10 @@ Formatted Result in Streamlit
 ```
 .
 ├── app.py
+├── init_db.py
 ├── student_grade.db
-├── create_db.py
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
 └── README.md
 ```
@@ -82,45 +91,71 @@ Formatted Result in Streamlit
 * Ollama (Gemma 3 1B)
 * SQLite
 * Pandas
+* Docker
 
 ---
 
-## ⚙️ Setup Instructions
+# ⚙️ Setup Instructions
 
-### 1️⃣ Install Ollama
+---
+
+## 1️⃣ Install Ollama (Host Machine)
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-Pull required models:
+Pull required model:
 
 ```bash
 ollama pull gemma3:1b
 ```
 
----
+Make Ollama accessible to Docker:
 
-### 2️⃣ Install Python Dependencies
+Edit:
 
 ```bash
-pip install -r requirements.txt
+sudo nano /etc/systemd/system/ollama.service
+```
+
+Add:
+
+```ini
+Environment="OLLAMA_HOST=0.0.0.0"
+```
+
+Then:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart ollama
+```
+
+Verify:
+
+```bash
+ss -tulnp | grep 11434
+```
+
+Should show:
+
+```
+*:11434
 ```
 
 ---
 
-### 3️⃣ Create Database
+## 2️⃣ Build and Run with Docker
 
 ```bash
-python create_db.py
+docker compose up --build
 ```
 
----
+Open in browser:
 
-### 4️⃣ Run the App
-
-```bash
-streamlit run app.py
+```
+http://localhost:8501
 ```
 
 ---
@@ -128,12 +163,14 @@ streamlit run app.py
 ## ✨ Key Features
 
 * ✅ Fully local LLM (no API cost)
-* ✅ Natural language to SQL conversion
-* ✅ Structured prompt with schema injection
-* ✅ SQL output cleaning (removes markdown formatting)
+* ✅ Dockerized application
+* ✅ Ollama host integration
+* ✅ Natural language → SQL conversion
+* ✅ Schema-aware prompting
+* ✅ SQL markdown cleaning
 * ✅ Formatted tabular results
-* ✅ Error handling with Streamlit UI
-* ✅ Lightweight (works on 8GB RAM)
+* ✅ Error handling in UI
+* ✅ Lightweight (runs on 8GB RAM)
 
 ---
 
@@ -141,24 +178,25 @@ streamlit run app.py
 
 * Learning Text-to-SQL systems
 * AI-powered database assistants
-* Internal data tools
-* AI Data Analyst POC
 * Local AI experimentation
+* Backend + LLM integration practice
+* AI Data Analyst prototype
 
 ---
 
-## 💡 Why This Project Matters
-
-This project demonstrates:
+## 💡 What This Project Demonstrates
 
 * Practical LLM integration
 * LCEL pipeline usage
-* Prompt engineering for structured outputs
-* Local AI system architecture
-* Real-world AI data tooling
+* Prompt engineering for structured output
+* Docker networking (host ↔ container)
+* Linux service configuration
+* Real-world AI app architecture
 
 ---
 
-Built as a local AI experiment combining backend engineering + LLM systems 🚀
+Built as a local AI engineering experiment combining:
+
+Backend Development + Docker + LLM Systems 🚀
 
 ---
