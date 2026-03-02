@@ -1,3 +1,4 @@
+import os
 import re
 import pandas as pd
 import streamlit as st
@@ -5,6 +6,8 @@ from langchain_community.utilities import SQLDatabase
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from dotenv import load_dotenv
+load_dotenv()
 
 # Page Setup
 st.set_page_config(page_title="Text-to-SQL App",layout="centered")
@@ -17,7 +20,8 @@ db = SQLDatabase.from_uri("sqlite:///student_grade.db")
 # Local LLM (ollama)
 llm = ChatOllama(
     model="gemma3:1b",
-    temperature=0
+    temperature=0,
+    base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 )
 
 # Prompt (LCEL)
